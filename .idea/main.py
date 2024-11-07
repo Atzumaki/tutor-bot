@@ -4,24 +4,27 @@ import random
 from telebot import types
 
 bot = telebot.TeleBot('7717923468:AAHMyX8Jrv8XLOBNmBtlyYi69G4TjuvY8vc')
-global picture
-picture = os.listdir("Picture")
-global adminids
+
+picture = os.listdir("Pictures")
 adminids = []
+answers = []
 with open('AdminID', mode='r') as f:
     for _ in f.readlines():
         adminids.append(_[:-1])
+with open('answer', encoding='utf-8') as file:
+    for _ in file.readlines():
+        answers.append(_[:-1])
 
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup()
     btn1 = types.KeyboardButton('Профком')
     btn2 = types.KeyboardButton('МФСО')
-    btn3 = types.KeyboardButton('Деканат')
-    btn4 = types.KeyboardButton('Социальная работа')
+    btn3 = types.KeyboardButton('Факультеты/институты')
+    btn4 = types.KeyboardButton('Деканат')
     btn5 = types.KeyboardButton('Общежитие')
-    btn6 = types.KeyboardButton('Международное сотрудничество')
-    btn7 = types.KeyboardButton('Стипендии')
+    btn6 = types.KeyboardButton('Стипендии')
+    btn7 = types.KeyboardButton('ВУЦ')
     btn8 = types.KeyboardButton('Мотивация')
     btn9 = types.KeyboardButton('Вопрос админу')
     markup.row(btn1, btn2)
@@ -42,21 +45,53 @@ def adminOut(message1, userid, adminid):
 
 @bot.message_handler()
 def on_click(message):
-    if message.text == 'Мотивация':
+    if message.text == "Профком":
+        section_1_menu(message)
+    elif message.text == "МФСО":
+        section_2_menu(message)
+    elif message.text == "Факультеты/институты":
+        section_1_menu(message)
+    elif message.text == "Деканат":
+        section_2_menu(message)
+    elif message.text == "Общежитие":
+        section_1_menu(message)
+    elif message.text == "Стипендии":
+        section_2_menu(message)
+    elif message.text == "ВУЦ":
+        section_1_menu(message)
+    elif message.text == 'Мотивация':
         title = picture[random.randint(0, len(picture) - 1)]
         file = open(f'Picture/{title}', mode='rb')
         bot.send_photo(message.chat.id, file)
         file.close()
     elif message.text == 'Вопрос админу':
         bot.send_message(message.chat.id, 'Введите свой вопрос:')
-        # admin_id = adminids[random.randint(0, len(adminids) - 1)]
-        admin_id = 1447192776
+        admin_id = adminids[random.randint(0, len(adminids) - 1)]
         bot.register_next_step_handler(message, adminIn, message.chat.id, admin_id)
-    else:
-        if message.chat.id in adminids:
-            pass
-        else:
-            bot.send_message(message.chat.id, 'Кринж несёшь милая, я не понял')
+    elif message.text == 'что такое профком?':
+        bot.send_message(message.chat.id, answers[0])
+    elif message.text == 'Что такое профсоюз?':
+        bot.send_message(message.chat.id, answers[1])
+    elif message.text == 'Что такое профбюро?':
+        bot.send_message(message.chat.id, answers[2])
+    elif message.text == 'Что такое МФСО?':
+        bot.send_message(message.chat.id, answers[3])
+    elif message.text == 'Где находится МФСО?':
+        bot.send_message(message.chat.id, answers[4])
+    elif message.text == 'Какой режим работы МФСО?':
+        bot.send_message(message.chat.id, answers[5])
 
+    else:
+        print("Не пон")
+
+# Раздел 1
+def section_1_menu(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    # Кнопки для раздела 1
+    btn1 = types.KeyboardButton("что такое профком?")
+    btn2 = types.KeyboardButton("Что такое профсоюз?")
+    btn3 = types.KeyboardButton("Что такое профбюро?")
+    markup.add(btn1, btn2, btn3)
+    bot.send_message(message.chat.id, "Вы в разделе Профсоюз", reply_markup=markup)
 
 bot.polling(non_stop=True)
